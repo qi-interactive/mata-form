@@ -1,0 +1,6 @@
+{
+    "name": "Form",
+    "description": "Manages forms for MATA",
+    "icon" : "/images/module-icon.svg",
+    "version" : 1.0
+}
