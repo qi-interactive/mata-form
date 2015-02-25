@@ -12,6 +12,7 @@ use Yii;
  * @property string $ReferencedTable
  */
 class Form extends \matacms\db\ActiveRecord {
+    
     /**
      * @inheritdoc
      */
@@ -27,6 +28,7 @@ class Form extends \matacms\db\ActiveRecord {
             [['Name', 'ReferencedTable'], 'required'],
             [['Name'], 'string', 'max' => 128],
             [['ReferencedTable'], 'string', 'max' => 64],
+            [['ReferencedTable'], 'validateReferencedTable'],
         ];
     }
 
@@ -39,5 +41,46 @@ class Form extends \matacms\db\ActiveRecord {
             'Name' => 'Name',
             'ReferencedTable' => 'Referenced Table',
         ];
+    }
+
+    public function autoCompleteData() {
+        $db = $this->db;
+        if ($db !== null) {
+            return [
+                'ReferencedTable' => function () use ($db) {
+                    return $this->findFormTableNames();
+                },
+            ];
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Validates the [[tableName]] attribute.
+     */
+    public function validateReferencedTable()
+    {
+        $formTables = $this->findFormTableNames();
+        if (!in_array($this->ReferencedTable, $formTables)) {
+            $this->addError('ReferencedTable', "Table '{$this->ReferencedTable}' does not exist.");
+        }
+    }
+
+    protected function findFormTableNames() {
+        $db = $this->db;
+        if ($db === null) {
+            return [];
+        }
+        $formTableNames = [];
+        $tableNames = $db->getSchema()->getTableNames();
+        if(!empty($tableNames)) {
+            foreach ($tableNames as $tableName) {
+                if(strpos($tableName, 'form_') === 0) {
+                    $formTableNames[] = $tableName;
+                }
+            }
+        }
+        return $formTableNames;
     }
 }
