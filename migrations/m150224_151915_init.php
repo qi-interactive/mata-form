@@ -20,8 +20,8 @@ class m150224_151915_init extends Migration {
 	public function up() {
 		$this->createTable('{{%mata_form}}', [
 			'Id' => Schema::TYPE_PK,
-			'Name' => Schema::TYPE_TEXT . '(128) NOT NULL',
-			'ReferencedTable'  => Schema::TYPE_TEXT . '(64) NOT NULL'
+			'Name' => Schema::TYPE_STRING . '(128) NOT NULL',
+			'ReferencedTable'  => Schema::TYPE_STRING . '(64) NOT NULL'
 			]);
 	}
 

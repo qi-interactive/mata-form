@@ -17,7 +17,7 @@ class Form extends \matacms\db\ActiveRecord {
      * @inheritdoc
      */
     public static function tableName() {
-        return 'mata_form';
+        return '{{%mata_form}}';
     }
 
     /**
