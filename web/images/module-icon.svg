@@ -6,22 +6,30 @@
 	<g>
 		<g>
 			
-				<rect x="8.426" y="23.738" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="9.385" height="7.869"/>
+				<line fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="27.714" y1="15.232" x2="19.999" y2="15.232"/>
+		</g>
+		<g>
 			
-				<line fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="22.045" y1="27.672" x2="31.32" y2="27.672"/>
+				<line fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="27.714" y1="21.979" x2="19.999" y2="21.979"/>
+		</g>
+		<g>
 			
-				<line fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="22.045" y1="23.738" x2="31.32" y2="23.738"/>
-			<path fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
-				M10.225,19.664c-1.769,0-2.33-1.146-1.244-2.544l5.287-6.727c1.086-1.399,2.883-1.416,3.996-0.037l1.877,2.33
-				c1.111,1.38,2.164,2.507,3.877,0.996c1.283-1.131,2.904-0.51,4.185,0.71l2.621,3.051c1.283,1.221,0.881,2.221-0.889,2.221H10.225
-				z"/>
-			<path fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
-				M24.057,12.564c-0.725-1.451-0.146-3.215,1.305-3.945c1.449-0.729,3.217-0.149,3.945,1.301c0.729,1.449,0.146,3.216-1.301,3.943"
-				/>
+				<line fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="27.714" y1="29.496" x2="19.999" y2="29.496"/>
 		</g>
 		<path fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
-			M35.408,32.481c0,1.618-1.312,2.926-2.926,2.926H7.519c-1.617,0-2.928-1.308-2.928-2.926V7.519c0-1.615,1.31-2.926,2.928-2.926
-			h24.963c1.613,0,2.926,1.311,2.926,2.926V32.481z"/>
+			M27.785,6.033h1.274c1.614,0,2.926,1.31,2.926,2.926v24.279c0,1.616-1.312,2.927-2.926,2.927H10.94
+			c-1.616,0-2.925-1.311-2.925-2.927V8.959c0-1.616,1.309-2.926,2.925-2.926h1.301"/>
+		
+			<rect x="15.597" y="3.835" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" width="8.805" height="4.396"/>
+		
+			<polyline fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			12.712,14.826 13.838,15.953 16.814,12.977 		"/>
+		
+			<polyline fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			12.712,22.342 13.838,23.468 16.814,20.493 		"/>
+		
+			<polyline fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+			12.712,29.858 13.838,30.983 16.814,28.008 		"/>
 	</g>
 </g>
 <g id="labels" display="none">
