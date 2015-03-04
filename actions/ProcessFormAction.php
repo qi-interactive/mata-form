@@ -3,11 +3,13 @@
 namespace mata\form\actions;
 
 use Yii;
+use sammaye\mailchimp\Mailchimp;
 
 class ProcessFormAction extends \yii\base\Action {
 
 	public $model;
 	public $notify = [];
+	public $mailChimpOptions = [];
 	public $redirect;
 
 	public function run() {
@@ -20,7 +22,7 @@ class ProcessFormAction extends \yii\base\Action {
 				if(!$this->model->save()) {
 					throw new NotFoundHttpException('The requested page does not exist.');
 				}
-				$this->sendNotifications($this->notify);
+				$this->sendNotifications()->subscribeToMailChimpList();
 
 				// Add Thank you message (?)
 			} catch (\Exception $e) {
@@ -39,19 +41,31 @@ class ProcessFormAction extends \yii\base\Action {
 		// 	]);
 	}
 
-	protected function sendNotifications($recipients) {
-		if(empty($recipients))
-			return;
-
-		$recipients = (is_array($recipients)) ? $recipients : [$recipients];
-		foreach ($recipients as $recipient) {
-			\Yii::$app->mailer->compose()
-                    ->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
-                    ->setTo($recipient)
-                    ->setSubject('New Form Submission ' . \Yii::$app->name)
-                    ->setTextBody('body')
-                    ->send();
+	protected function sendNotifications() {
+		if(!empty($this->notify)) {
+			$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
+			foreach ($recipients as $recipient) {
+				\Yii::$app->mailer->compose()
+				->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
+				->setTo($recipient)
+				->setSubject('New Form Submission ' . \Yii::$app->name)
+				->setTextBody('body')
+				->send();
+			}
 		}
+		return $this;
+	}
+
+	protected function subscribeToMailChimpList() {
+		if(!empty($this->mailChimpOptions)) {
+			$emailAttribute = $this->mailChimpOptions['modelEmailAttributeName'];
+			$mailChimpAPI = new \sammaye\mailchimp\Mailchimp(['apikey' => $this->mailChimpOptions['apiKey']]);
+			$mailChimpAPI->lists->subscribe(
+				$this->mailChimpOptions['listId'], 
+				['email' => $this->model->$emailAttribute]
+				);
+		}
+		return $this;
 	}
 
 
