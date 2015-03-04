@@ -14,7 +14,6 @@ class ProcessFormAction extends \yii\base\Action {
 
 	public function run() {
 
-		$isDynamicModel = is_a($this->model, 'mata\base\DynamicModel');
 		// Load data and validate
 		if($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
 			// Save to database
