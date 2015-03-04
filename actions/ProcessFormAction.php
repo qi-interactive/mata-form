@@ -31,14 +31,6 @@ class ProcessFormAction extends \yii\base\Action {
 		}
 		return $this->controller->redirect(!empty($this->redirect) ? $this->redirect : Yii::$app->request->referrer);
 		
-		// $revisions = Revision::find()->where([
-		// 	"DocumentId" => $documentId
-		// 	])->orderBy("Revision DESC")->all();
-
-
-		// return $this->controller->render($this->view ?: $this->id, [
-		// 	"revisions" => $revisions
-		// 	]);
 	}
 
 	protected function sendNotifications() {
