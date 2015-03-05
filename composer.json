@@ -11,7 +11,7 @@
         "codeception/codeception": "*",
         "yiisoft/yii2-codeception": "*",
         "yiisoft/yii2-faker": "*",
-        "sammaye/yii2-mailchimp": "*"
+        "mailchimp/mailchimp": "*"
     },
     "autoload": {
         "psr-4": {

@@ -3,7 +3,8 @@
 namespace mata\form\actions;
 
 use Yii;
-use sammaye\mailchimp\Mailchimp;
+use mata\form\base\ValidationException;
+use \Mailchimp as MailchimpApi;
 
 class ProcessFormAction extends \yii\base\Action {
 
@@ -11,38 +12,53 @@ class ProcessFormAction extends \yii\base\Action {
 	public $notify = [];
 	public $mailChimpOptions = [];
 	public $redirect;
+	public $onValidationErrorHandler;
+
+	public function init() {
+		if(empty($this->onValidationErrorHandler)) {
+			$this->onValidationErrorHandler = function($model, $exception) {
+				throw $exception;
+			};
+		}
+		
+	}
 
 	public function run() {
-
 		// Load data and validate
-		if($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
-			// Save to database
-			try {
+		try {
+			if($this->model->load(Yii::$app->request->post()) && $this->isDataValid()) {
+				// Save to database
 				if(!$this->model->save()) {
 					throw new NotFoundHttpException('The requested page does not exist.');
 				}
 				$this->sendNotifications()->subscribeToMailChimpList();
-
 				// Add Thank you message (?)
-			} catch (\Exception $e) {
-				throw $e;
-			}			
+
+			}
+
+		} catch (ValidationException $e) {
+			call_user_func_array($this->onValidationErrorHandler, [$this->model, $e]);
 		}
+
 		return $this->controller->redirect(!empty($this->redirect) ? $this->redirect : Yii::$app->request->referrer);
+
 		
+	}
+	public function isDataValid() {
+		if(!$this->model->validate())
+			throw new ValidationException();
+		return true;
 	}
 
 	protected function sendNotifications() {
-		if(!empty($this->notify)) {
-			$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
-			foreach ($recipients as $recipient) {
-				\Yii::$app->mailer->compose()
-				->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
-				->setTo($recipient)
-				->setSubject('New Form Submission ' . \Yii::$app->name)
-				->setTextBody('body')
-				->send();
-			}
+		$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
+		foreach ($recipients as $recipient) {
+			\Yii::$app->mailer->compose()
+			->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
+			->setTo($recipient)
+			->setSubject('New Form Submission ' . \Yii::$app->name)
+			->setTextBody('body')
+			->send();
 		}
 		return $this;
 	}
@@ -50,7 +66,7 @@ class ProcessFormAction extends \yii\base\Action {
 	protected function subscribeToMailChimpList() {
 		if(!empty($this->mailChimpOptions)) {
 			$emailAttribute = $this->mailChimpOptions['modelEmailAttributeName'];
-			$mailChimpAPI = new \sammaye\mailchimp\Mailchimp(['apikey' => $this->mailChimpOptions['apiKey']]);
+			$mailChimpAPI = new MailchimpApi($this->mailChimpOptions['apiKey']);
 			$mailChimpAPI->lists->subscribe(
 				$this->mailChimpOptions['listId'], 
 				['email' => $this->model->$emailAttribute]
