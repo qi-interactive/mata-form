@@ -31,7 +31,7 @@ class ProcessFormAction extends \yii\base\Action {
 				if(!$this->model->save()) {
 					throw new NotFoundHttpException('The requested page does not exist.');
 				}
-				$this->sendNotifications()->subscribeToMailChimpList();
+				$this->subscribeToMailChimpList()->sendNotifications();
 				// Add Thank you message (?)
 
 			}
@@ -40,7 +40,8 @@ class ProcessFormAction extends \yii\base\Action {
 			call_user_func_array($this->onValidationErrorHandler, [$this->model, $e]);
 		}
 
-		return $this->controller->redirect(!empty($this->redirect) ? $this->redirect : Yii::$app->request->referrer);
+		if ($this->redirect != false)
+			return $this->controller->redirect(!empty($this->redirect) ? $this->redirect : Yii::$app->request->referrer);
 
 		
 	}
@@ -66,12 +67,16 @@ class ProcessFormAction extends \yii\base\Action {
 	protected function subscribeToMailChimpList() {
 		if(!empty($this->mailChimpOptions)) {
 			$emailAttribute = $this->mailChimpOptions['modelEmailAttributeName'];
-			$mailChimpAPI = new MailchimpApi($this->mailChimpOptions['apiKey']);
-			$mailChimpAPI->lists->subscribe(
-				$this->mailChimpOptions['listId'], 
-				['email' => $this->model->$emailAttribute]
-				);
+			$this->subscribeToMailChimpListInternal($this->mailChimpOptions['apiKey'], $this->mailChimpOptions['listId'], $this->model->$emailAttribute);
 		}
+		return $this;
+	}
+
+	protected function subscribeToMailChimpListInternal($apiKey, $listId, $email) {
+		$mailChimpAPI = new MailchimpApi($apiKey);
+		$mailChimpAPI->lists->subscribe($listId, 
+			['email' => $email]
+			);
 		return $this;
 	}
 
