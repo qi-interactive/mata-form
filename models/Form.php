@@ -43,19 +43,6 @@ class Form extends \matacms\db\ActiveRecord {
         ];
     }
 
-    public function autoCompleteData() {
-        $db = $this->db;
-        if ($db !== null) {
-            return [
-                'ReferencedTable' => function () use ($db) {
-                    return $this->findFormTableNames();
-                },
-            ];
-        } else {
-            return [];
-        }
-    }
-
     /**
      * Validates the [[tableName]] attribute.
      */
@@ -67,7 +54,7 @@ class Form extends \matacms\db\ActiveRecord {
         }
     }
 
-    protected function findFormTableNames() {
+    public function findFormTableNames() {
         $db = $this->db;
         if ($db === null) {
             return [];
@@ -76,9 +63,9 @@ class Form extends \matacms\db\ActiveRecord {
         $tableNames = $db->getSchema()->getTableNames();
         if(!empty($tableNames)) {
             foreach ($tableNames as $tableName) {
-                if(strpos($tableName, 'form_') === 0) {
+                // if(strpos($tableName, 'form_') === 0) {
                     $formTableNames[] = $tableName;
-                }
+                // }
             }
         }
         return $formTableNames;
