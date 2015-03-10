@@ -14,7 +14,9 @@ class FormClient {
 			// 'enableClientScript' => false,
 			'action' => $action,
 			'fieldAttributes' => $fieldAttributes,
-			'options' => $options
+			'options' => $options,
+	      	// 'enableClientValidation' => false
+
 			]);
 
 		// TO BE REMOVED LATER

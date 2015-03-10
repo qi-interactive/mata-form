@@ -11,7 +11,7 @@ class ProcessFormAction extends \yii\base\Action {
 	public $model;
 	public $notify = [];
 	public $mailChimpOptions = [];
-	public $redirect;
+	public $redirect = true;
 	public $onValidationErrorHandler;
 
 	public function init() {
@@ -33,7 +33,6 @@ class ProcessFormAction extends \yii\base\Action {
 				}
 				$this->subscribeToMailChimpList()->sendNotifications();
 				// Add Thank you message (?)
-
 			}
 
 		} catch (ValidationException $e) {
@@ -42,9 +41,9 @@ class ProcessFormAction extends \yii\base\Action {
 
 		if ($this->redirect != false)
 			return $this->controller->redirect(!empty($this->redirect) ? $this->redirect : Yii::$app->request->referrer);
-
 		
 	}
+
 	public function isDataValid() {
 		if(!$this->model->validate())
 			throw new ValidationException();
