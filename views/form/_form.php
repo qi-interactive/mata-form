@@ -15,7 +15,7 @@ yii\gii\GiiAsset::register($this);
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'Name')->textInput(['maxlength' => 128]) ?>
-    <?= $form->field($model, 'ReferencedTable')->multiselect($model->findFormTableNames()); ?>
+    <?= $form->field($model, 'ReferencedTable')->dropDownList($model->findFormTableNames()); ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

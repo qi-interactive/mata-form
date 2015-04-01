@@ -5,22 +5,42 @@ namespace mata\form\actions;
 use Yii;
 use mata\form\base\ValidationException;
 use \Mailchimp as MailchimpApi;
+use yii\base\Event;
+use mata\base\MessageEvent;
 
 class ProcessFormAction extends \yii\base\Action {
 
 	public $model;
+	public $formClass = \mata\form\widgets\DynamicForm::class;
 	public $notify = [];
 	public $mailChimpOptions = [];
-	public $redirect = true;
 	public $onValidationErrorHandler;
+	public $onValidationSuccessHandler;
+	public $onSuccess;
+	public $successMessage;
 
 	public function init() {
+
 		if(empty($this->onValidationErrorHandler)) {
 			$this->onValidationErrorHandler = function($model, $exception) {
-				throw $exception;
+				$session = Yii::$app->getSession();
+				$cacheKey = uniqid($model->tableName());
+				$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => true, 'message' => null];
+				\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
+				$session->set('form_' . $model->tableName(), $cacheKey);
 			};
 		}
-		
+
+		if(empty($this->onValidationSuccessHandler)) {
+			$this->onValidationSuccessHandler = function($model) {
+				$session = Yii::$app->getSession();
+				$cacheKey = uniqid($model->tableName());
+				$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => false, 'message' => $this->successMessage];
+				\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
+				$session->set('form_' . $model->tableName(), $cacheKey);
+			};
+		}	
+
 	}
 
 	public function run() {
@@ -32,15 +52,14 @@ class ProcessFormAction extends \yii\base\Action {
 					throw new NotFoundHttpException('The requested page does not exist.');
 				}
 				$this->subscribeToMailChimpList()->sendNotifications();
-				// Add Thank you message (?)
+				call_user_func_array($this->onValidationSuccessHandler, [$this->model]);
 			}
 
 		} catch (ValidationException $e) {
 			call_user_func_array($this->onValidationErrorHandler, [$this->model, $e]);
-		}
 
-		if ($this->redirect != false)
-			return $this->controller->redirect(!empty($this->redirect) ? $this->redirect : Yii::$app->request->referrer);
+		}
+		return $this->controller->redirect(Yii::$app->request->referrer);
 		
 	}
 
@@ -72,10 +91,17 @@ class ProcessFormAction extends \yii\base\Action {
 	}
 
 	protected function subscribeToMailChimpListInternal($apiKey, $listId, $email) {
-		$mailChimpAPI = new MailchimpApi($apiKey);
-		$mailChimpAPI->lists->subscribe($listId, 
-			['email' => $email]
+		try {
+			$mailChimpAPI = new MailchimpApi($apiKey);
+			$mailChimpAPI->lists->subscribe($listId, 
+				['email' => $email]
 			);
+			
+		} catch (\Mailchimp_List_AlreadySubscribed $e) {
+			$this->model->addError($this->mailChimpOptions['modelEmailAttributeName'], $e->getMessage());
+			throw new ValidationException();
+		}
+
 		return $this;
 	}
 

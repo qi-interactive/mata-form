@@ -64,7 +64,7 @@ class Form extends \matacms\db\ActiveRecord {
         if(!empty($tableNames)) {
             foreach ($tableNames as $tableName) {
                 // if(strpos($tableName, 'form_') === 0) {
-                    $formTableNames[] = $tableName;
+                    $formTableNames[$tableName] = $tableName;
                 // }
             }
         }
