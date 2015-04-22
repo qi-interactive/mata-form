@@ -12,6 +12,7 @@
 namespace mata\form;
 
 use mata\base\Module as BaseModule;
+use yii\helpers\Json;
 
 /**
  * This is the main module class for the Yii2-user.
@@ -28,9 +29,15 @@ class Module extends BaseModule {
 		$forms = \mata\form\models\Form::find()->all();
 		$navigation = [];
 		foreach ($forms as $form) {
+			if(!empty($form->Extra)) {
+				$settings = Json::decode($form->Extra);
+				if(isset($settings['canShowInSubNavigation']) && !$settings['canShowInSubNavigation'])
+					continue;
+			}
+
 			$navigation[] = [
 				'label' => $form->getLabel(),
-				'url' => "/mata-cms/form/form/submissions?id=$form->Id",
+				'url' => "/mata-cms/form/submission/list?id=$form->Id",
 				'icon' => "/images/module-icon.svg"
 			];
 		}
