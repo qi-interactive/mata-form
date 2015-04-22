@@ -19,4 +19,16 @@ class FormController extends Controller {
 		return new FormSearch();
 	}
 
+	public function actionSubmissions($id) {
+
+		$formModel = \mata\form\models\Form::findOne($id);
+
+		$dynamicModel = new \mata\db\DynamicActiveRecord($formModel->ReferencedTable);
+		$submissions = $dynamicModel->find()->all();
+
+		return $this->render("submissions", [
+			'submissions' => $submissions,
+			]);
+	}
+
 }

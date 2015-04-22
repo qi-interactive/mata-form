@@ -7,6 +7,9 @@ use mata\form\base\ValidationException;
 use \Mailchimp as MailchimpApi;
 use yii\base\Event;
 use mata\base\MessageEvent;
+use yii\web\Response;
+use yii\helpers\Json;
+
 
 class ProcessFormAction extends \yii\base\Action {
 
@@ -16,7 +19,7 @@ class ProcessFormAction extends \yii\base\Action {
 	public $mailChimpOptions = [];
 	public $onValidationErrorHandler;
 	public $onValidationSuccessHandler;
-	public $onSuccess;
+	public $onAjaxSuccess;
 	public $successMessage;
 
 	public function init() {
@@ -33,11 +36,17 @@ class ProcessFormAction extends \yii\base\Action {
 
 		if(empty($this->onValidationSuccessHandler)) {
 			$this->onValidationSuccessHandler = function($model) {
-				$session = Yii::$app->getSession();
-				$cacheKey = uniqid($model->tableName());
-				$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => false, 'message' => $this->successMessage];
-				\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
-				$session->set('form_' . $model->tableName(), $cacheKey);
+				if(\Yii::$app->request->isAjax && !empty($this->onAjaxSuccess)) {
+		            Yii::$app->response->format = Response::FORMAT_JSON;
+		            call_user_func_array($this->onAjaxSuccess, [$this->successMessage]);
+		            Yii::$app->end();
+		        } else {
+		        	$session = Yii::$app->getSession();
+					$cacheKey = uniqid($model->tableName());
+					$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => false, 'message' => $this->successMessage];
+					\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
+					$session->set('form_' . $model->tableName(), $cacheKey);
+		        }				
 			};
 		}	
 
@@ -59,6 +68,7 @@ class ProcessFormAction extends \yii\base\Action {
 			call_user_func_array($this->onValidationErrorHandler, [$this->model, $e]);
 
 		}
+
 		return $this->controller->redirect(Yii::$app->request->referrer);
 		
 	}

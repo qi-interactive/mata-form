@@ -9,6 +9,7 @@ use ReflectionClass;
 use yii\helpers\ArrayHelper;
 use yii\base\Event;
 use mata\base\MessageEvent;
+use yii\web\View;
 
 class DynamicForm extends \mata\widgets\DynamicForm {
 
@@ -18,9 +19,10 @@ class DynamicForm extends \mata\widgets\DynamicForm {
     public $omitId = true;
     public $autoRenderFields = true;
     public $hasSuccessMessage = false;
+    public $ajaxSubmit = false;
+    public $onAjaxSubmitSuccess = '';
     private $modelAttributes;
 
-    
 	public function init()
 	{
 		if (!isset($this->options['id'])) {
@@ -114,6 +116,28 @@ class DynamicForm extends \mata\widgets\DynamicForm {
 
         if(!$this->hasSuccessMessage)
             echo Html::endForm();
+
+        if($this->ajaxSubmit) {
+            \Yii::$app->view->registerJs("
+                $('#" . $this->id . "').on('beforeSubmit', function(event, jqXHR, settings) {
+                    var form = $(this);
+                    if(form.find('.has-error').length) {
+                        return false;
+                    }
+                    
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        dataType: 'json',
+                        success: function(data) {
+                            $this->onAjaxSubmitSuccess
+                        }
+                    });
+                
+                    return false;
+                });", View::POS_READY);
+        }
     }
     
 }

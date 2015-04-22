@@ -25,6 +25,19 @@ class Module extends BaseModule {
 	public $runBootstrap = true;
 
 	public function getNavigation() {
-		return "/mata-cms/form/form";
+		$forms = \mata\form\models\Form::find()->all();
+		$navigation = [];
+		foreach ($forms as $form) {
+			$navigation[] = [
+				'label' => $form->getLabel(),
+				'url' => "/mata-cms/form/form/submissions?id=$form->Id",
+				'icon' => "/images/module-icon.svg"
+			];
+		}
+		
+		return $navigation;
+
+
+		// return "/mata-cms/form/form";
 	}
 }
