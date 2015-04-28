@@ -16,6 +16,7 @@ class ProcessFormAction extends \yii\base\Action {
 	public $model;
 	public $formClass = \mata\form\widgets\DynamicForm::class;
 	public $notify = [];
+	public $notifySubject;
 	public $mailChimpOptions = [];
 	public $onValidationErrorHandler;
 	public $onValidationSuccessHandler;
@@ -81,11 +82,12 @@ class ProcessFormAction extends \yii\base\Action {
 
 	protected function sendNotifications() {
 		$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
+		$subject = (!empty($this->notifySubject)) ? $this->notifySubject : 'New Form Submission ' . \Yii::$app->name;
 		foreach ($recipients as $recipient) {
 			\Yii::$app->mailer->compose()
 			->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
 			->setTo($recipient)
-			->setSubject('New Form Submission ' . \Yii::$app->name)
+			->setSubject($subject)
 			->setTextBody('body')
 			->send();
 		}
