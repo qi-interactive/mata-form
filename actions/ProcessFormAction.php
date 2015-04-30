@@ -20,26 +20,32 @@ class ProcessFormAction extends \yii\base\Action {
 	public $mailChimpOptions = [];
 	public $onValidationErrorHandler;
 	public $onValidationSuccessHandler;
-	public $onAjaxSuccess;
+	public $onAjaxResponse;
 	public $successMessage;
 
 	public function init() {
 
 		if(empty($this->onValidationErrorHandler)) {
 			$this->onValidationErrorHandler = function($model, $exception) {
-				$session = Yii::$app->getSession();
-				$cacheKey = uniqid($model->tableName());
-				$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => true, 'message' => null];
-				\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
-				$session->set('form_' . $model->tableName(), $cacheKey);
+				if(\Yii::$app->request->isAjax && !empty($this->onAjaxResponse)) {
+		            Yii::$app->response->format = Response::FORMAT_JSON;
+		            call_user_func_array($this->onAjaxResponse, ['ERROR', $this->model->getTopError()]);
+		            Yii::$app->end();
+		        } else {
+		        	$session = Yii::$app->getSession();
+					$cacheKey = uniqid($model->tableName());
+					$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => true, 'message' => null];
+					\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
+					$session->set('form_' . $model->tableName(), $cacheKey);
+		        }				
 			};
 		}
 
 		if(empty($this->onValidationSuccessHandler)) {
 			$this->onValidationSuccessHandler = function($model) {
-				if(\Yii::$app->request->isAjax && !empty($this->onAjaxSuccess)) {
+				if(\Yii::$app->request->isAjax && !empty($this->onAjaxResponse)) {
 		            Yii::$app->response->format = Response::FORMAT_JSON;
-		            call_user_func_array($this->onAjaxSuccess, [$this->successMessage]);
+		            call_user_func_array($this->onAjaxResponse, ['OK', $this->successMessage]);
 		            Yii::$app->end();
 		        } else {
 		        	$session = Yii::$app->getSession();
@@ -109,7 +115,7 @@ class ProcessFormAction extends \yii\base\Action {
 				['email' => $email]
 			);
 			
-		} catch (\Mailchimp_List_AlreadySubscribed $e) {
+		} catch (\Mailchimp_Error $e) {
 			$this->model->addError($this->mailChimpOptions['modelEmailAttributeName'], $e->getMessage());
 			throw new ValidationException();
 		}

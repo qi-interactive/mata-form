@@ -20,7 +20,7 @@ class DynamicForm extends \mata\widgets\DynamicForm {
     public $autoRenderFields = true;
     public $hasSuccessMessage = false;
     public $ajaxSubmit = false;
-    public $onAjaxSubmitSuccess = '';
+    public $onAjaxSubmitResponse;
     private $modelAttributes;
 
 	public function init()
@@ -131,7 +131,7 @@ class DynamicForm extends \mata\widgets\DynamicForm {
                         data: form.serialize(),
                         dataType: 'json',
                         success: function(data) {
-                            $this->onAjaxSubmitSuccess
+                            $this->onAjaxSubmitResponse
                         }
                     });
                 
