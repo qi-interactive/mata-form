@@ -20,6 +20,12 @@ class Form extends \matacms\db\ActiveRecord {
         return '{{%mata_form}}';
     }
 
+    public function behaviors() {
+      return [
+     
+      ];
+    }
+
     /**
      * @inheritdoc
      */
