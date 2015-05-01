@@ -67,6 +67,7 @@ class ProcessFormAction extends \yii\base\Action {
 				if(!$this->model->save()) {
 					throw new NotFoundHttpException('The requested page does not exist.');
 				}
+
 				$this->subscribeToMailChimpList()->sendNotifications();
 				call_user_func_array($this->onValidationSuccessHandler, [$this->model]);
 			}
@@ -87,6 +88,16 @@ class ProcessFormAction extends \yii\base\Action {
 	}
 
 	protected function sendNotifications() {
+		// $model = $this->model->findOne($this->model->getPrimaryKey());
+		$this->model->refresh();
+		$body = '';
+
+		foreach($this->model->attributes as $attribute => $value) {
+			if($attribute == 'Id')
+				continue;
+			$body .= '<p>' . $this->model->getAttributeLabel($attribute) . ': <strong>' . $value . '</strong></p>';
+		}
+
 		$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
 		$subject = (!empty($this->notifySubject)) ? $this->notifySubject : 'New Form Submission ' . \Yii::$app->name;
 		foreach ($recipients as $recipient) {
@@ -94,7 +105,7 @@ class ProcessFormAction extends \yii\base\Action {
 			->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
 			->setTo($recipient)
 			->setSubject($subject)
-			->setTextBody('body')
+			->setHtmlBody($body)
 			->send();
 		}
 		return $this;
