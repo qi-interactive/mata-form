@@ -4,6 +4,8 @@ namespace mata\form\actions;
 
 use Yii;
 use mata\form\base\ValidationException;
+use matacms\settings\models\Setting;
+use matacms\form\models\Form;
 use \Mailchimp as MailchimpApi;
 use yii\base\Event;
 use mata\base\MessageEvent;
@@ -88,9 +90,10 @@ class ProcessFormAction extends \yii\base\Action {
 	}
 
 	protected function sendNotifications() {
-		// $model = $this->model->findOne($this->model->getPrimaryKey());
 		$this->model->refresh();
 		$body = '';
+
+		$formModel = Form::find()->where(["ReferencedTable" => $this->model->tableName()])->one();
 
 		foreach($this->model->attributes as $attribute => $value) {
 			if($attribute == 'Id')
@@ -98,11 +101,14 @@ class ProcessFormAction extends \yii\base\Action {
 			$body .= '<p>' . $this->model->getAttributeLabel($attribute) . ': <strong>' . $value . '</strong></p>';
 		}
 
+		$fromEmail = !empty(Setting::findValue('NOTIFICATION_FROM_EMAIL')) ? Setting::findValue('NOTIFICATION_FROM_EMAIL') : \Yii::$app->params['adminEmail'];
+		$fromName = !empty($formModel) ? 'New ' . $formModel->Name . ' form submission' : \Yii::$app->name . ' notification';
+		
 		$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
 		$subject = (!empty($this->notifySubject)) ? $this->notifySubject : 'New Form Submission ' . \Yii::$app->name;
 		foreach ($recipients as $recipient) {
 			\Yii::$app->mailer->compose()
-			->setFrom([\Yii::$app->params['adminEmail'] => \Yii::$app->name . ' notification'])
+			->setFrom([$fromEmail => $fromName])
 			->setTo($recipient)
 			->setSubject($subject)
 			->setHtmlBody($body)
