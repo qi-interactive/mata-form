@@ -1,16 +1,12 @@
 {
     "name": "mata/mata-form",
-    "description": "Manages forms for MATA",
+    "description": "Manages forms for MATA Framework applications.",
     "keywords": ["yii2", "mata-form", "form", "mata"],
     "type": "yii2-extension",
     "license": "MIT",
-    "support": {
-    },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
-        "codeception/codeception": "*",
-        "yiisoft/yii2-codeception": "*",
-        "yiisoft/yii2-faker": "*"
+        "mailchimp/mailchimp": "2.*"
     },
     "autoload": {
         "psr-4": {
