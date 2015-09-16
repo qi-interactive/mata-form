@@ -1,5 +1,5 @@
 <?php
- 
+
 /**
  * @link http://www.matacms.com/
  * @copyright Copyright (c) 2015 Qi Interactive Limited
@@ -43,9 +43,9 @@ class ProcessFormAction extends \yii\base\Action {
 		        	$session = Yii::$app->getSession();
 					$cacheKey = uniqid($model->tableName());
 					$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => true, 'message' => null];
-					\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
+					\Yii::$app->cache->set($cacheKey, $cacheValue, 1800);
 					$session->set('form_' . $model->tableName(), $cacheKey);
-		        }				
+		        }
 			};
 		}
 
@@ -59,11 +59,11 @@ class ProcessFormAction extends \yii\base\Action {
 		        	$session = Yii::$app->getSession();
 					$cacheKey = uniqid($model->tableName());
 					$cacheValue = ['form' => $model->tableName(), 'model' => $model, 'hasErrors' => false, 'message' => $this->successMessage];
-					\Yii::$app->cache->set($cacheKey, $cacheValue, 1800); 
+					\Yii::$app->cache->set($cacheKey, $cacheValue, 1800);
 					$session->set('form_' . $model->tableName(), $cacheKey);
-		        }				
+		        }
 			};
-		}	
+		}
 
 	}
 
@@ -86,7 +86,7 @@ class ProcessFormAction extends \yii\base\Action {
 		}
 
 		return $this->controller->redirect(Yii::$app->request->referrer);
-		
+
 	}
 
 	public function isDataValid() {
@@ -107,9 +107,9 @@ class ProcessFormAction extends \yii\base\Action {
 			$body .= '<p>' . $this->model->getAttributeLabel($attribute) . ': <strong>' . $value . '</strong></p>';
 		}
 
-		$fromEmail = !empty(Setting::findValue('NOTIFICATION_FROM_EMAIL')) ? Setting::findValue('NOTIFICATION_FROM_EMAIL') : \Yii::$app->params['adminEmail'];
+		$fromEmail = !empty(Setting::findValue('NOTIFICATION_FROM_EMAIL')) ? Setting::findValue('NOTIFICATION_FROM_EMAIL') : \Yii::$app->params['notificationEmail'];
 		$fromName = !empty($formModel) ? 'New ' . $formModel->Name . ' form submission' : \Yii::$app->name . ' notification';
-		
+
 		$recipients = (is_array($this->notify)) ? $this->notify : [$this->notify];
 		$subject = (!empty($this->notifySubject)) ? $this->notifySubject : 'New Form Submission ' . \Yii::$app->name;
 		foreach ($recipients as $recipient) {
@@ -134,10 +134,10 @@ class ProcessFormAction extends \yii\base\Action {
 	protected function subscribeToMailChimpListInternal($apiKey, $listId, $email) {
 		try {
 			$mailChimpAPI = new MailchimpApi($apiKey);
-			$mailChimpAPI->lists->subscribe($listId, 
+			$mailChimpAPI->lists->subscribe($listId,
 				['email' => $email]
 			);
-			
+
 		} catch (\Mailchimp_Error $e) {
 			$this->model->addError($this->mailChimpOptions['modelEmailAttributeName'], $e->getMessage());
 			throw new ValidationException();
@@ -145,4 +145,4 @@ class ProcessFormAction extends \yii\base\Action {
 
 		return $this;
 	}
-}  
+}
