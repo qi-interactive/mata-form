@@ -6,7 +6,7 @@ Manages forms for MATA Framework applications.
 Installation
 ------------
 
-- Add the module using composer: 
+- Add the module using composer:
 
 ```json
 "mata/mata-form": "~1.0.0"
@@ -22,6 +22,10 @@ Renders a [`Dynamic From`](https://github.com/qi-interactive/mata-form/blob/mast
 
 Changelog
 ---------
+
+## 1.0.1-alpha, September 16, 2015
+
+- Changed adminEmail param to notificationEmail in ProcessFormAction
 
 ## 1.0.0-alpha, May 18, 2015
 
