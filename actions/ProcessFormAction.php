@@ -126,16 +126,25 @@ class ProcessFormAction extends \yii\base\Action {
 	protected function subscribeToMailChimpList() {
 		if(!empty($this->mailChimpOptions)) {
 			$emailAttribute = $this->mailChimpOptions['modelEmailAttributeName'];
-			$this->subscribeToMailChimpListInternal($this->mailChimpOptions['apiKey'], $this->mailChimpOptions['listId'], $this->model->$emailAttribute);
+			$mergeVarsAttributes = $this->mailChimpOptions['mergeVarsAttributes'];
+			$mergeVars = null;
+			if(!empty($mergeVarsAttributes)) {
+				foreach($mergeVarsAttributes as $mergeVarsAttribute => $modelAttribute) {
+					$mergeVars[$mergeVarsAttribute] = $this->model->$modelAttribute;
+				}
+			}
+			$this->subscribeToMailChimpListInternal($this->mailChimpOptions['apiKey'], $this->mailChimpOptions['listId'], $this->model->$emailAttribute, $mergeVars);
 		}
 		return $this;
 	}
 
-	protected function subscribeToMailChimpListInternal($apiKey, $listId, $email) {
+	protected function subscribeToMailChimpListInternal($apiKey, $listId, $email, $mergeVars = null) {
 		try {
 			$mailChimpAPI = new MailchimpApi($apiKey);
-			$mailChimpAPI->lists->subscribe($listId,
-				['email' => $email]
+			$mailChimpAPI->lists->subscribe(
+				$listId,
+				['email' => $email],
+				$mergeVars
 			);
 
 		} catch (\Mailchimp_Error $e) {

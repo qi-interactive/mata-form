@@ -23,6 +23,10 @@ Renders a [`Dynamic From`](https://github.com/qi-interactive/mata-form/blob/mast
 Changelog
 ---------
 
+## 1.0.1.1-alpha, November 18, 2015
+
+- Added support for Mailchimp's mergeVars in ProcessFormAction
+
 ## 1.0.1-alpha, September 16, 2015
 
 - Changed adminEmail param to notificationEmail in ProcessFormAction
